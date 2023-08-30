@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实况地球-SHSSEDU</title>
+    <style>
+        body {
+            width: 100vw;
+            height: 100vh;
+            padding: 0;
+            margin: 0;
+            background-color: black;
+            overflow-x: hidden;
+        }
+
+        .live-earth {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .live-earth-grid {
+            display: grid;
+            grid-template-columns: repeat(var(--level, 1), calc(var(--scale, 1.0) * 550px));
+            grid-template-rows: repeat(var(--level, 1), calc(var(--scale, 1.0) * 600px));
+        }
+
+        .live-earth-grid>img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .info {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            color: aliceblue;
+            margin-right: 20px;
+            font-size: smaller;
+        }
+
+        .info a {
+            text-decoration: none;
+            color: aliceblue;
+            font-weight: bolder;
+            z-index: 99999;
+        }
+
+        .menu {
+            width: 185px;
+            height: 22px;
+            margin: 10px;
+        }
+
+        .menu a {
+            color: rgb(255, 255, 255);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="menu">
+        <a href="index.html">首页</a>
+        <a href="index.html">向日葵8号</a>
+        <a href="#" class="hide">隐藏菜单</a>
+    </div>
+
+    <script>
+        const hideLink = document.querySelector('.menu .hide');
+        const menu = document.querySelector('.menu');
+        hideLink.addEventListener('click', function (event) {
+            event.preventDefault();
+            menu.style.display = 'none';
+        });
+
+    </script>
+    <div class="live-earth">
+        <div class="live-earth-grid" id="live-earth"></div>
+    </div>
+    <div class="info">
+        <p>本网页图像来自 <a href="http://rsapp.nsmc.org.cn/geofy/">风云4号A星</a> 气象卫星,15分钟更新一次。</p>
+    </div>
+    <!-- <div id="weather"></div> -->
+    <div style="position: fixed; width: 100%; height: 100%;"></div>
+    <script>
+
+        let level = 1; // Assign a value to the level variable
+        let liveEarthGrid = document.getElementById("live-earth");
+        liveEarthGrid.style.setProperty("--level", level);
+        liveEarthGrid.innerHTML = "";
+        for (let i = 0; i < level; i++) {
+            for (let j = 0; j < level; j++) {
+                let imageUri = "https://img.nsmc.org.cn/CLOUDIMAGE/FY4B/AGRI/GCLR/FY4B_DISK_GCLR.JPG";
+                let image = document.createElement('img');
+                image.src = imageUri;
+                liveEarthGrid.appendChild(image);
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>

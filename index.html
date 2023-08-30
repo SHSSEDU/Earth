@@ -50,6 +50,7 @@
             padding: 0;
             margin: 0;
             background-color: black;
+            overflow-x: hidden;
         }
 
         .live-earth {
@@ -84,7 +85,8 @@
         #weather>iframe {
             margin-right: 5%;
         }
-        .info{
+
+        .info {
             position: fixed;
             bottom: 0;
             right: 0;
@@ -92,15 +94,44 @@
             margin-right: 20px;
             font-size: smaller;
         }
-        .info a{
+
+        .info a {
             text-decoration: none;
             color: aliceblue;
             font-weight: bolder;
         }
+
+        .menu {
+            width: 185px;
+            height: 22px;
+            margin: 10px;
+        }
+
+        .menu a {
+            color: rgb(255, 255, 255);
+        }
     </style>
+
 </head>
 
 <body>
+    <div class="menu">
+        <a href="index.html">首页</a>
+        <a href="FY.html">风云4号</a>
+        <a href="#" class="hide">隐藏菜单</a>
+
+    </div>
+    <script>
+        const hideLink = document.querySelector('.menu .hide');
+        const menu = document.querySelector('.menu');
+
+        hideLink.addEventListener('click', function (event) {
+            event.preventDefault();
+            menu.style.display = 'none';
+        });
+
+    </script>
+
     <div class="live-earth">
         <div class="live-earth-grid" id="live-earth"></div>
     </div>
