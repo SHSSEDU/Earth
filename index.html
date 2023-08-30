@@ -107,21 +107,30 @@
         <p>本网页图像来自 <a href="https://himawari8.nict.go.jp/">向日葵8号</a> 气象卫星,10分钟更新一次。</p>
     </div>
     <div style="position: fixed; width: 100%; height: 100%;"></div>
-    <script>!function () {
-            var e = new Date;
-            t = (t = e.getTime()) - t % 6e5 - 36e5, e.setTime(t),
-                year = e.getUTCFullYear(), month = e.getUTCMonth() + 1,
-                day = e.getUTCDate(),
-                hour = e.getUTCHours(),
-                minute = e.getUTCMinutes(),
-                month < 10 && (month = "0" + month),
-                day < 10 && (day = "0" + day),
-                hour < 10 && (hour = "0" + hour),
-                minute < 10 && (minute = "0" + minute),
-                document.getElementById("himawari-time").innerHTML = "图像拍摄时间：" + e.toLocaleString(),
-                document.getElementById("himawari-pic").src = "https://himawari8-dl.nobug.dev/himawari8/img/D531106/1d/550/" + year + "/" + month + "/" + day + "/" + hour + minute + "00_0_0.png"
-            //https://himawari8-dl.nict.go.jp/ 上面的实效换这个
-        }()
+    <script>
+        let currentDate = "";
+        fetch('https://himawari8-dl.nobug.dev/himawari8/img/FULL_24h/latest.json')
+            .then(response => response.json())
+            .then(data => {
+                //const date = data.date; // 获取年月日信息
+                //console.log(date); // 在控制台输出年月日
+
+                let latestTime = data.date;
+                if (currentDate === latestTime && liveEarthGrid.style.getPropertyValue("--level") == level) {
+                    return Promise.reject("Earth image is latest.");
+                }
+                currentDate = latestTime;
+                var time = latestTime.replace(/[\s\-]/g, "/").replace(/[:]/g, "");
+                console.log(time);
+                document.getElementById("himawari-time").innerHTML = "图像拍摄时间：" + latestTime,
+                    document.getElementById("himawari-pic").src = "https://himawari8-dl.nobug.dev/himawari8/img/D531106/1d/550/" + time + "_0_0.png"
+                //https://himawari8-dl.nict.go.jp/ 上面的实效换这个
+            })
+            .catch(error => {
+                console.log('请求失败:', error);
+            });
+
+
 
         var link = document.getElementById('link');
         link.addEventListener('click', function (event) {
