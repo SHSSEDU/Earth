@@ -99,21 +99,29 @@
     <!-- <div id="weather"></div> -->
     <div style="position: fixed; width: 100%; height: 100%;"></div>
     <script>
-
-        let level = 1; // Assign a value to the level variable
-        let liveEarthGrid = document.getElementById("live-earth");
-        liveEarthGrid.style.setProperty("--level", level);
-        liveEarthGrid.innerHTML = "";
-        for (let i = 0; i < level; i++) {
-            for (let j = 0; j < level; j++) {
-                let imageUri = "https://img.nsmc.org.cn/CLOUDIMAGE/FY4B/AGRI/GCLR/FY4B_DISK_GCLR.JPG";
-                let image = document.createElement('img');
-                image.src = imageUri;
-                image.setAttribute('data-original', imageUri);
-                image.id = "image";
-                liveEarthGrid.appendChild(image);
+        // 定义刷新时间间隔（5分钟）
+        const refreshInterval = 1 * 60 * 1000; // 5分钟 = 5 * 60秒 * 1000毫秒
+        function refreshData() {
+            let level = 1; // Assign a value to the level variable
+            let liveEarthGrid = document.getElementById("live-earth");
+            liveEarthGrid.style.setProperty("--level", level);
+            liveEarthGrid.innerHTML = "";
+            for (let i = 0; i < level; i++) {
+                for (let j = 0; j < level; j++) {
+                    let imageUri = "https://img.nsmc.org.cn/CLOUDIMAGE/FY4B/AGRI/GCLR/FY4B_DISK_GCLR.JPG";
+                    let image = document.createElement('img');
+                    image.src = imageUri;
+                    image.setAttribute('data-original', imageUri);
+                    image.id = "image";
+                    liveEarthGrid.appendChild(image);
+                }
             }
         }
+        // 页面加载时先加载一次数据
+        refreshData();
+        // 设置定时器
+        setInterval(refreshData, refreshInterval);
+
 
 
         var link = document.getElementById('link');
