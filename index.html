@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -11,45 +12,6 @@
     <script src="https://cdnjs.loli.net/ajax/libs/viewerjs/1.11.5/viewer.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/viewerjs/1.11.5/viewer.min.css" />
 
-    <script>
-        let level = 1; // Image level for Himawari-8 image.
-        let mapInterval = 20; // Update map in minute
-        let city = "Shanghai"; // City
-        let forecastInterval = 120; // Update forecast in minute
-        // const h8Baseuri = "https://himawari8-dl.nict.go.jp/"; // The baseuri for himawari-8
-        const h8Baseuri = "https://himawari8-dl.nobug.dev/"; // A cdn for himawari-8, if it downs, switch back to the original node above.
-
-        window.wallpaperPropertyListener = {
-            applyUserProperties: function (properties) {
-                if (properties.maplevel) {
-                    level = Number(properties.maplevel.value);
-                    loadEarthTimer();
-                }
-                if (properties.mapscale) {
-                    let scale = Number(properties.mapscale.value);
-                    document.getElementById("live-earth").style.setProperty("--scale", scale);
-                }
-                if (properties.mapupdateinterval) {
-                    mapInterval = Number(properties.mapupdateinterval.value);
-                    loadEarthTimer();
-                }
-                if (properties.city) {
-                    city = properties.city.value;
-                    loadForecastTimer();
-                }
-                if (properties.forecastupdateinterval) {
-                    forecastInterval = Number(properties.forecastupdateinterval.value);
-                    loadForecastTimer();
-                }
-            },
-            setPaused: function (isPaused) {
-                if (!isPaused) {
-                    loadEarthTimer();
-                    loadForecastTimer();
-                }
-            },
-        };
-    </script>
     <style>
         body {
             width: 100vw;
@@ -62,6 +24,7 @@
 
         .live-earth {
             position: fixed;
+            top: 30px;
             width: 100%;
             height: 100%;
             display: flex;
@@ -71,26 +34,14 @@
 
         .live-earth-grid {
             display: grid;
-            grid-template-columns: repeat(var(--level, 1), calc(var(--scale, 1.0) * 550px));
-            grid-template-rows: repeat(var(--level, 1), calc(var(--scale, 1.0) * 550px));
+            grid-template-columns: 550px;
+            grid-template-rows: 550px;
         }
 
         .live-earth-grid>img {
             width: 100%;
             height: 100%;
-        }
-
-        #weather {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        #weather>iframe {
-            margin-right: 5%;
+            transform: scale(0.8);
         }
 
         .info {
@@ -117,6 +68,11 @@
         .menu a {
             color: rgb(255, 255, 255);
         }
+
+        #himawari-time {
+            color: aliceblue;
+            margin: 10px;
+        }
     </style>
 
 </head>
@@ -130,114 +86,56 @@
         <a href="#" class="hide">隐藏菜单</a>
 
     </div>
+    <p id="himawari-time" class="himawari-time">加载速度稍慢，请稍候……</p>
     <script>
         const hideLink = document.querySelector('.menu .hide');
         const menu = document.querySelector('.menu');
+        const himawaritime = document.querySelector('.himawari-time');
 
         hideLink.addEventListener('click', function (event) {
             event.preventDefault();
             menu.style.display = 'none';
+            himawaritime.style.display = 'none';
         });
 
     </script>
-
     <div class="live-earth">
-        <div class="live-earth-grid" id="live-earth"></div>
+        <div class="live-earth-grid" id="live-earth"> <img id="himawari-pic" src=""></div>
     </div>
+
     <div class="info">
         <p>本网页图像来自 <a href="https://himawari8.nict.go.jp/">向日葵8号</a> 气象卫星,10分钟更新一次。</p>
     </div>
-    <!-- <div id="weather"></div> -->
     <div style="position: fixed; width: 100%; height: 100%;"></div>
-    <script>
-        let currentDate = "";
+    <script>!function () {
+            var e = new Date;
+            t = (t = e.getTime()) - t % 6e5 - 36e5, e.setTime(t),
+                year = e.getUTCFullYear(), month = e.getUTCMonth() + 1,
+                day = e.getUTCDate(),
+                hour = e.getUTCHours(),
+                minute = e.getUTCMinutes(),
+                month < 10 && (month = "0" + month),
+                day < 10 && (day = "0" + day),
+                hour < 10 && (hour = "0" + hour),
+                minute < 10 && (minute = "0" + minute),
+                document.getElementById("himawari-time").innerHTML = "图像拍摄时间：" + e.toLocaleString(),
+                document.getElementById("himawari-pic").src = "https://himawari8-dl.nobug.dev/himawari8/img/D531106/1d/550/" + year + "/" + month + "/" + day + "/" + hour + minute + "00_0_0.png"
+            //https://himawari8-dl.nict.go.jp/ 上面的实效换这个
+        }()
 
-        let loadEarth = () => {
-            let liveEarthGrid = document.getElementById("live-earth");
+        var link = document.getElementById('link');
+        link.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default link behavio
+            var image = document.getElementById('himawari-pic');
+            var viewer = new Viewer(image, {
+                inline: false, // Set to false to display an independent image viewer on click
+                viewed() {
+                    viewer.zoomTo(1); // Set default zoom level to 1
+                },
+            });
 
-            fetch(h8Baseuri + "himawari8/img/FULL_24h/latest.json")
-                .then(res => res.json())
-                .then(data => {
-                    let latestTime = data.date;
-                    if (currentDate === latestTime && liveEarthGrid.style.getPropertyValue("--level") == level) {
-                        return Promise.reject("Earth image is latest.");
-                    }
-                    currentDate = latestTime;
-                    return latestTime.replace(/[\s\-]/g, "/").replace(/[:]/g, "");
-                })
-                .then(imageid => {
-                    liveEarthGrid.style.setProperty("--level", level);
-                    liveEarthGrid.innerHTML = "";
-                    for (let i = 0; i < level; i++) {
-                        for (let j = 0; j < level; j++) {
-                            let imageuri = `${h8Baseuri}himawari8/img/D531106/${level}d/550/${imageid}_${j}_${i}.png`;
-                            console.log(imageuri);
-                            let image = document.createElement('img');
-                            image.src = imageuri;
-                            image.setAttribute('data-original', imageuri);
-                            image.id = "image";
-                            liveEarthGrid.appendChild(image);
-                        }
-                    }
-                    var link = document.getElementById('link');
-                    link.addEventListener('click', function (event) {
-                        event.preventDefault(); // Prevent the default link behavio
-
-                        var viewer = new Viewer(image, {
-                            inline: false, // Set to false to display an independent image viewer on click
-                            viewed() {
-                                viewer.zoomTo(1); // Set default zoom level to 1
-                            },
-                        });
-
-                        viewer.show();
-                    });
-                }, reject => {
-                    console.info(reject);
-                });
-        };
-
-
-        let loadForecast = () => {
-            if (!city) {
-                return;
-            }
-
-            fetch(`https://www.meteoblue.com/en/server/search/query3?query=${city}&itemsPerPage=1&page=1`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.results.length == 0) {
-                        return new Promise.reject("No city found");
-                    }
-                    return data.results[0];
-                })
-                .then(city => {
-                    let weather = document.getElementById("weather");
-
-                    weather.innerHTML = `<iframe src="https://www.meteoblue.com/en/weather/widget/daily/${city.url}?geoloc=fixed&days=7&tempunit=CELSIUS&windunit=METER_PER_SECOND&precipunit=MILLIMETER&coloured=monochrome&pictoicon=0&pictoicon=1&maxtemperature=0&maxtemperature=1&mintemperature=0&mintemperature=1&windspeed=0&windspeed=1&windgust=0&winddirection=0&winddirection=1&uv=0&humidity=0&humidity=1&precipitation=0&precipitation=1&precipitationprobability=0&precipitationprobability=1&spot=0&spot=1&pressure=0&layout=dark"  frameborder="0" scrolling="NO" allowtransparency="true" sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width: 378px; height: 420px"></iframe>`;
-                });
-        }
-
-        var earthTimer;
-        var forecastTimer;
-
-        let loadEarthTimer = () => {
-            if (earthTimer) {
-                clearInterval(earthTimer);
-            }
-            earthTimer = setInterval(loadEarth, mapInterval * 60 * 1000);
-            loadEarth();
-        }
-        let loadForecastTimer = () => {
-            if (forecastTimer) {
-                clearInterval(forecastTimer);
-            }
-            forecastTimer = setInterval(loadForecast, forecastInterval * 60 * 1000);
-            loadForecast();
-        }
-
-        loadEarthTimer();
-        loadForecastTimer();
+            viewer.show();
+        });
     </script>
 </body>
 
