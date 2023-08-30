@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>实况地球-SHSSEDU</title>
+    <!-- Favicon  -->
+    <link rel="shortcut icon" type="image/x-icon"
+        href="https://jsd.onmicrosoft.cn/gh/SHSSEDU/LOGO@main/LOGO-removebg.png">
+    <!-- jQuery library -->
+    <script src="https://cdnjs.loli.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.loli.net/ajax/libs/viewerjs/1.11.5/viewer.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/viewerjs/1.11.5/viewer.min.css" />
     <style>
         body {
             width: 100vw;
@@ -52,7 +59,7 @@
         }
 
         .menu {
-            width: 270px;
+            width: 330px;
             height: 22px;
             margin: 10px;
         }
@@ -68,7 +75,9 @@
         <a href="index.html">首页</a>
         <a href="https://shssedu.ac.cn/">SHSSEDU</a>
         <a href="index.html">向日葵8号</a>
+        <a href="#" id="link">放大图片</a>
         <a href="#" class="hide">隐藏菜单</a>
+
     </div>
 
     <script>
@@ -81,7 +90,7 @@
 
     </script>
     <div class="live-earth">
-        <div class="live-earth-grid" id="live-earth"></div>
+        <div class="live-earth-grid imageViewer" id="live-earth"></div>
     </div>
     <div class="info">
         <p>本网页图像来自 <a href="http://rsapp.nsmc.org.cn/geofy/">风云4号A星</a> 气象卫星,15分钟更新一次。</p>
@@ -99,11 +108,26 @@
                 let imageUri = "https://img.nsmc.org.cn/CLOUDIMAGE/FY4B/AGRI/GCLR/FY4B_DISK_GCLR.JPG";
                 let image = document.createElement('img');
                 image.src = imageUri;
+                image.setAttribute('data-original', imageUri);
+                image.id = "image";
                 liveEarthGrid.appendChild(image);
             }
         }
 
 
+        var link = document.getElementById('link');
+        link.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default link behavio
+
+            var viewer = new Viewer(image, {
+                inline: false, // Set to false to display an independent image viewer on click
+                viewed() {
+                    viewer.zoomTo(1); // Set default zoom level to 1
+                },
+            });
+
+            viewer.show();
+        });
 
     </script>
 </body>
