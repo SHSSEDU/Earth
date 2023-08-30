@@ -112,8 +112,7 @@
         fetch('https://himawari8-dl.nobug.dev/himawari8/img/FULL_24h/latest.json')
             .then(response => response.json())
             .then(data => {
-                //const date = data.date; // 获取年月日信息
-                //console.log(date); // 在控制台输出年月日
+               
 
                 let latestTime = data.date;
                 if (currentDate === latestTime && liveEarthGrid.style.getPropertyValue("--level") == level) {
@@ -121,9 +120,14 @@
                 }
                 currentDate = latestTime;
                 var time = latestTime.replace(/[\s\-]/g, "/").replace(/[:]/g, "");
-                console.log(time);
-                document.getElementById("himawari-time").innerHTML = "图像拍摄时间：" + latestTime,
-                    document.getElementById("himawari-pic").src = "https://himawari8-dl.nobug.dev/himawari8/img/D531106/1d/550/" + time + "_0_0.png"
+                console.log(latestTime);
+                let dateObj = new Date(latestTime);
+                // 将时间加上8小时
+                dateObj.setHours(dateObj.getHours() + 8);
+                // 将处理后的时间转换为字符串
+                let updatedTime = dateObj.toLocaleString();
+                document.getElementById("himawari-time").innerHTML = "图像拍摄时间：" + updatedTime;
+                document.getElementById("himawari-pic").src = "https://himawari8-dl.nobug.dev/himawari8/img/D531106/1d/550/" + time + "_0_0.png"
                 //https://himawari8-dl.nict.go.jp/ 上面的实效换这个
             })
             .catch(error => {
